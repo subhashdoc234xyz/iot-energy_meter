@@ -31,15 +31,14 @@
 const char* WIFI_SSID     = "ssid_here";
 const char* WIFI_PASSWORD = "password_here";
 
-const char* PC_IP         = "ip.address.here";  // Your PC's IP (hotspot/LAN)
+const char* PC_IP         = "ip.address.here"; // Your PC's IP (hotspot/LAN)
 const int   LOG_PORT      = 5000;
 const int   PRED_PORT     = 5001;
 
-const unsigned long SEND_INTERVAL    = 30000UL;   // 30 seconds
+const unsigned long SEND_INTERVAL    = 30000UL;  // 30 seconds
 const unsigned long PREDICT_INTERVAL = 300000UL;  // 5 minutes
 
 const float DEFAULT_RATE = 8.0;
-
 // Appliance detection threshold (watts) — if power > this, appliance is ON
 const float APPLIANCE_ON_THRESHOLD = 0.1;
 
@@ -136,7 +135,6 @@ float calcBill(float watts, float hours) {
 // ════════════════════════════════════════════════════════════
 void updateRunTime() {
   bool isOn = (sensorOk && power > APPLIANCE_ON_THRESHOLD);
-
   if (isOn && !applianceOn) {
     applianceOn = true;
     appOnStart  = millis();
@@ -149,17 +147,17 @@ void updateRunTime() {
   unsigned long currentOnMs = totalOnMs;
   if (applianceOn) currentOnMs += (millis() - appOnStart);
   runTimeTotalSec = currentOnMs / 1000.0;
-
+  
   // Uptime since boot in seconds
   float uptimeSec = (millis() - bootMillis) / 1000.0;
   if (uptimeSec < 1) uptimeSec = 1;
 
   // ON fraction (0.0 to 1.0)
   float onFraction = runTimeTotalSec / uptimeSec;
-
+  
   // Extrapolate to periods
-  runTimePerHour  = onFraction * 3600.0;          // seconds ON per hour
-  runTimePerDay   = (onFraction * 86400.0) / 3600.0;   // hours ON per day
+  runTimePerHour  = onFraction * 3600.0;    // seconds ON per hour
+  runTimePerDay   = (onFraction * 86400.0) / 3600.0;  // hours ON per day
   runTimePerWeek  = runTimePerDay * 7.0;
   runTimePerMonth = runTimePerDay * 30.0;
 }
@@ -212,7 +210,8 @@ void oledPage0_LiveReadings() {
   display.print(F("V: "));  display.print(voltage, 1);  display.println(F(" V"));
   display.print(F("I: "));  display.print(current, 3);  display.println(F(" A"));
   display.print(F("P: "));  display.print(power, 1);    display.println(F(" W"));
-  display.print(F("E: "));  display.print(energy, 3);   display.println(F(" kWh"));
+  display.print(F("E: "));
+  display.print(energy, 3);   display.println(F(" kWh"));
   if (!sensorOk) { display.setCursor(0, 56); display.println(F("! SENSOR ERROR")); }
   display.display();
 }
@@ -236,7 +235,8 @@ void oledPage2_Bills() {
   display.setCursor(0, 0);  display.println(F("-- Bill Estimate --"));
   display.print(F("1 hr : Rs.")); display.println(calcBill(power, 1),   2);
   display.print(F("1 day: Rs.")); display.println(calcBill(power, 24),  2);
-  display.print(F("7 day: Rs.")); display.println(calcBill(power, 168), 2);
+  display.print(F("7 day: Rs."));
+  display.println(calcBill(power, 168), 2);
   display.print(F("30day: Rs.")); display.println(calcBill(power, 720), 2);
   display.display();
 }
@@ -264,7 +264,8 @@ void oledPage4_AIPrediction() {
   display.setRotation(2);
   display.clearDisplay();
   display.setTextSize(1);
-  display.setCursor(0, 0);  display.println(F("-- AI Prediction --"));
+  display.setCursor(0, 0);
+  display.println(F("-- AI Prediction --"));
   if (predictionReady) {
     display.print(F("Power: "));   display.print(predictedPower, 1);   display.println(F(" W"));
     display.print(F("Bill/h: Rs.")); display.println(predictedBill1h, 2);
@@ -320,7 +321,7 @@ void sendDataToServer() {
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
   http.setTimeout(5000);
-
+  
   String body = "{";
   body += "\"voltage\":"         + String(voltage,      2) + ",";
   body += "\"current\":"         + String(current,      3) + ",";
@@ -372,7 +373,6 @@ void fetchPrediction() {
       int h = (t / 3600) % 24;
       int m = (t / 60) % 60;
       predictionTime = (h < 10 ? "0" : "") + String(h) + ":" + (m < 10 ? "0" : "") + String(m);
-
       Serial.print("[AI] Predicted: "); Serial.print(predictedPower, 1);
       Serial.print(" W  Run/day: ");    Serial.print(predictedRunDay, 1); Serial.println(" h");
     }
@@ -413,17 +413,20 @@ String buildDashboardHTML() {
     filter:blur(80px); z-index:-1; opacity:0.4; animation:float 8s ease-in-out infinite;
   }
   body::before { background:radial-gradient(circle,rgba(56,189,248,0.4),transparent 70%); top:-100px; right:-100px; }
-  body::after  { background:radial-gradient(circle,rgba(16,185,129,0.3),transparent 70%); bottom:-100px; left:-100px; animation-delay:-4s; }
+  body::after  { background:radial-gradient(circle,rgba(16,185,129,0.3),transparent 70%); bottom:-100px; left:-100px; animation-delay:-4s;
+  }
 
   h1 { text-align:center; font-size:2rem; margin:10px 0 25px; font-weight:800;
     background:linear-gradient(135deg,#38bdf8,#22d3ee,#38bdf8);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    animation:pulseGlow 3s ease-in-out infinite; letter-spacing:0.5px; }
+    animation:pulseGlow 3s ease-in-out infinite; letter-spacing:0.5px;
+  }
 
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:18px; margin-bottom:24px; }
 
   .card, .section, .bill-item, .ai-card, .run-item {
-    background:rgba(30,41,59,0.55); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    background:rgba(30,41,59,0.55);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
     border:1px solid rgba(255,255,255,0.12);
     border-top:1px solid rgba(255,255,255,0.25);
     border-left:1px solid rgba(255,255,255,0.18);
@@ -437,58 +440,82 @@ String buildDashboardHTML() {
     transition:left 0.6s ease; pointer-events:none;
   }
   .card:hover::before,.section:hover::before,.bill-item:hover::before,.ai-card:hover::before,.run-item:hover::before { left:100%; }
-  .card { padding:22px 18px; text-align:center; border-bottom:3px solid rgba(56,189,248,0.5); }
+  .card { padding:22px 18px; text-align:center; border-bottom:3px solid rgba(56,189,248,0.5);
+  }
   .card:hover { transform:translateY(-5px) scale(1.02); border-color:rgba(56,189,248,0.7); z-index:2; }
-  .card .val { font-size:2rem; font-weight:800; color:#38bdf8; text-shadow:0 0 20px rgba(56,189,248,0.5); }
+  .card .val { font-size:2rem; font-weight:800; color:#38bdf8; text-shadow:0 0 20px rgba(56,189,248,0.5);
+  }
   .card .unit { font-size:0.9rem; color:#94a3b8; margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
-  .card .lbl  { font-size:0.95rem; color:#cbd5e1; margin-top:10px; font-weight:600; }
+  .card .lbl  { font-size:0.95rem; color:#cbd5e1; margin-top:10px;
+  font-weight:600; }
 
   .section { padding:24px; margin-bottom:24px; border-left:4px solid rgba(56,189,248,0.6); }
-  .section h2 { font-size:1.3rem; margin-bottom:20px; font-weight:700; color:#7dd3fc; display:flex; align-items:center; gap:8px; }
-  .section h2::before { content:''; width:8px; height:8px; background:#38bdf8; border-radius:50%; box-shadow:0 0 10px rgba(56,189,248,0.8); animation:pulseGlow 2s infinite; }
+  .section h2 { font-size:1.3rem; margin-bottom:20px; font-weight:700; color:#7dd3fc; display:flex;
+  align-items:center; gap:8px; }
+  .section h2::before { content:''; width:8px; height:8px; background:#38bdf8; border-radius:50%; box-shadow:0 0 10px rgba(56,189,248,0.8); animation:pulseGlow 2s infinite;
+  }
 
   .bill-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-  .bill-item,.ai-card,.run-item { padding:18px 14px; text-align:center; background:rgba(15,23,42,0.45); border:1px solid rgba(16,185,129,0.2); border-radius:16px; }
+  .bill-item,.ai-card,.run-item { padding:18px 14px; text-align:center; background:rgba(15,23,42,0.45); border:1px solid rgba(16,185,129,0.2); border-radius:16px;
+  }
   .bill-item:hover,.ai-card:hover,.run-item:hover { transform:translateY(-3px); border-color:rgba(16,185,129,0.5); }
-  .bill-item .bval,.ai-card .aval { font-size:1.5rem; font-weight:800; color:#10b981; text-shadow:0 0 15px rgba(16,185,129,0.4); }
-  .bill-item .blbl,.ai-card .albl { font-size:0.8rem; color:#94a3b8; margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  .bill-item .bval,.ai-card .aval { font-size:1.5rem; font-weight:800; color:#10b981; text-shadow:0 0 15px rgba(16,185,129,0.4);
+  }
+  .bill-item .blbl,.ai-card .albl { font-size:0.8rem; color:#94a3b8; margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
+  }
 
   /* Runtime card specific */
-  .run-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:16px; }
+  .run-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:16px;
+  }
   .run-item { border:1px solid rgba(251,146,60,0.25); }
   .run-item:hover { border-color:rgba(251,146,60,0.5); }
-  .run-item .rval { font-size:1.4rem; font-weight:800; color:#fb923c; text-shadow:0 0 12px rgba(251,146,60,0.4); }
+  .run-item .rval { font-size:1.4rem; font-weight:800; color:#fb923c;
+  text-shadow:0 0 12px rgba(251,146,60,0.4); }
   .run-item .rlbl { font-size:0.78rem; color:#94a3b8; margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
-  .appliance-status { display:flex; align-items:center; gap:10px; padding:14px 18px; border-radius:14px; margin-bottom:16px; font-weight:700; font-size:1.05rem; }
-  .appliance-on  { background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#10b981; }
+  .appliance-status { display:flex;
+  align-items:center; gap:10px; padding:14px 18px; border-radius:14px; margin-bottom:16px; font-weight:700; font-size:1.05rem; }
+  .appliance-on  { background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#10b981;
+  }
   .appliance-off { background:rgba(148,163,184,0.1); border:1px solid rgba(148,163,184,0.25); color:#94a3b8; }
-  .status-dot { width:10px; height:10px; border-radius:50%; }
+  .status-dot { width:10px; height:10px; border-radius:50%;
+  }
   .dot-on  { background:#10b981; box-shadow:0 0 10px #10b981; animation:tickPulse 1s infinite; }
-  .dot-off { background:#64748b; }
+  .dot-off { background:#64748b;
+  }
 
   /* AI run time items */
   .ai-run-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:14px; }
-  .ai-run-item { padding:14px; text-align:center; background:rgba(15,23,42,0.45); border:1px solid rgba(167,139,250,0.2); border-radius:14px; }
+  .ai-run-item { padding:14px;
+  text-align:center; background:rgba(15,23,42,0.45); border:1px solid rgba(167,139,250,0.2); border-radius:14px; }
   .ai-run-item:hover { border-color:rgba(167,139,250,0.5); transform:translateY(-2px); }
-  .ai-run-item .arval { font-size:1.3rem; font-weight:800; color:#a78bfa; }
+  .ai-run-item .arval { font-size:1.3rem; font-weight:800; color:#a78bfa;
+  }
   .ai-run-item .arlbl { font-size:0.75rem; color:#94a3b8; margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
 
-  .rate-form { display:flex; gap:12px; align-items:center; margin-top:20px; flex-wrap:wrap; }
-  .rate-form input { flex:1; min-width:120px; padding:14px 18px; border-radius:14px; border:1px solid rgba(56,189,248,0.35); background:rgba(15,23,42,0.65); color:#38bdf8; font-size:1rem; font-weight:600; outline:none; transition:all 0.25s ease; }
+  .rate-form { display:flex; gap:12px; align-items:center; margin-top:20px; flex-wrap:wrap;
+  }
+  .rate-form input { flex:1; min-width:120px; padding:14px 18px; border-radius:14px; border:1px solid rgba(56,189,248,0.35); background:rgba(15,23,42,0.65); color:#38bdf8; font-size:1rem; font-weight:600; outline:none;
+  transition:all 0.25s ease; }
   .rate-form input::placeholder { color:#475569; }
-  .rate-form input:focus { border-color:#38bdf8; box-shadow:0 0 0 3px rgba(56,189,248,0.2); }
-  .rate-form button { padding:14px 24px; background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(56,189,248,0.15)); backdrop-filter:blur(10px); color:#f0f9ff; border:1px solid rgba(56,189,248,0.65); border-radius:14px; font-size:1rem; font-weight:700; cursor:pointer; transition:all 0.2s ease; }
+  .rate-form input:focus { border-color:#38bdf8; box-shadow:0 0 0 3px rgba(56,189,248,0.2);
+  }
+  .rate-form button { padding:14px 24px; background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(56,189,248,0.15)); backdrop-filter:blur(10px); color:#f0f9ff; border:1px solid rgba(56,189,248,0.65); border-radius:14px; font-size:1rem; font-weight:700; cursor:pointer; transition:all 0.2s ease;
+  }
   .rate-form button:hover { background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(56,189,248,0.25)); transform:translateY(-2px); }
 
-  .status { font-size:0.9rem; color:#64748b; text-align:center; margin-top:24px; font-weight:600; padding:12px; background:rgba(30,41,59,0.3); border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
+  .status { font-size:0.9rem; color:#64748b; text-align:center; margin-top:24px; font-weight:600; padding:12px; background:rgba(30,41,59,0.3); border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08); }
   .badge-ok  { color:#10b981; font-weight:700; }
-  .badge-err { color:#ef4444; font-weight:700; }
+  .badge-err { color:#ef4444; font-weight:700;
+  }
 
   @media (max-width:480px) {
     .grid { grid-template-columns:repeat(2,1fr); }
-    .bill-grid,.run-grid,.ai-run-grid { grid-template-columns:1fr; }
+    .bill-grid,.run-grid,.ai-run-grid { grid-template-columns:1fr;
+    }
     h1 { font-size:1.6rem; }
-    .card .val { font-size:1.6rem; }
+    .card .val { font-size:1.6rem;
+    }
   }
 </style>
 </head>
@@ -505,7 +532,6 @@ String buildDashboardHTML() {
   html += "<div class='card'><div class='val'>" + String(frequency,1)   + "</div><div class='unit'>Hz</div><div class='lbl'>Frequency</div></div>";
   html += "<div class='card'><div class='val'>" + String(powerFactor,2) + "</div><div class='unit'>PF</div><div class='lbl'>Power Factor</div></div>";
   html += "</div>";
-
   // Bill estimates
   html += "<div class='section'><h2>Bill Estimate (Rs." + String(ratePerUnit,1) + "/kWh)</h2>";
   html += "<div class='bill-grid'>";
@@ -520,7 +546,7 @@ String buildDashboardHTML() {
     <button onclick="var r=document.getElementById('rI').value;if(r>0&&r<=50)window.location.href='/setrate?rate='+r;else alert('Enter 0.1-50');">Set Rate</button>
   </div>
   </div>)rawliteral";
-
+  
   // ── APPLIANCE RUNNING TIME ──────────────────────────────────
   html += "<div class='section'><h2>Appliance Running Time</h2>";
   if (applianceOn) {
@@ -604,6 +630,35 @@ String buildDataJSON() {
 }
 
 // ════════════════════════════════════════════════════════════
+//   BOOT ANIMATIONS
+// ════════════════════════════════════════════════════════════
+void bootAnimationGlitch() {
+  unsigned long start = millis();
+  while (millis() - start < 500) {
+    display.clearDisplay();
+    // Random noise pixels
+    for (int i = 0; i < 400; i++) {
+      display.drawPixel(random(OLED_WIDTH), random(OLED_HEIGHT), SSD1306_WHITE);
+    }
+    // Corrupted horizontal blocks and lines
+    for (int i = 0; i < 5; i++) {
+      display.fillRect(random(OLED_WIDTH), random(OLED_HEIGHT), random(10, 30), random(2, 10), SSD1306_WHITE);
+      display.drawLine(0, random(OLED_HEIGHT), OLED_WIDTH, random(OLED_HEIGHT), SSD1306_WHITE);
+    }
+    display.display();
+    // Rapid flicker
+    display.invertDisplay(random(2));
+    delay(random(10, 50));
+  }
+  display.invertDisplay(false);
+  display.clearDisplay();
+  display.display();
+  delay(200);
+}
+
+
+
+// ════════════════════════════════════════════════════════════
 //   SETUP
 // ════════════════════════════════════════════════════════════
 void setup() {
@@ -618,14 +673,11 @@ void setup() {
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("[OLED] Init failed!"));
   } else {
-    display.setRotation(2);
-    display.clearDisplay();
-    display.setTextColor(SSD1306_WHITE);
-    display.setTextSize(1);
-    display.setCursor(0, 0);
-    display.println(F("Energy Meter"));
-    display.println(F("Booting..."));
-    display.display();
+    display.setRotation(2); // Kept your original rotation config
+    
+    // ── ANIMATION SEQUENCE ──
+    bootAnimationGlitch();
+    bootAnimationMatrixRain();
   }
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
@@ -646,7 +698,8 @@ void setup() {
     Serial.print(F("\n[WiFi] IP: ")); Serial.println(WiFi.localIP());
     display.clearDisplay(); display.setCursor(0,0);
     display.println(F("WiFi Connected!"));
-    display.print(F("IP: ")); display.println(WiFi.localIP());
+    display.print(F("IP: "));
+    display.println(WiFi.localIP());
     display.display(); delay(2000);
   } else {
     Serial.println(F("[WiFi] FAILED — offline mode"));
@@ -692,7 +745,6 @@ void setup() {
 void loop() {
   readSensor();
   updateOLED();
-
   if (millis() - lastSendTime >= SEND_INTERVAL) {
     lastSendTime = millis();
     sendDataToServer();
