@@ -188,10 +188,10 @@ void readSensor() {
   float pf = pzem.pf();
 
   if (!isnan(v) && !isnan(c) && !isnan(p)) {
-    voltage     = v  * 1.0383;
+    voltage     = v  * 1.03607;
     current     = c;
-    power       = p  * 1.0383;
-    energy      = e  * 1.0383;
+    power       = p  * 1.03607;
+    energy      = e  * 1.03607;
     frequency   = f;
     powerFactor = pf;
     sensorOk    = true;
