@@ -677,7 +677,7 @@ void setup() {
     
     // ── ANIMATION SEQUENCE ──
     bootAnimationGlitch();
-    bootAnimationMatrixRain();
+    
   }
 
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
