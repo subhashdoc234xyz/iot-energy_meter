@@ -564,7 +564,7 @@ String buildDashboardHTML() {
   html += "</div>";
 
   // AI Prediction
-  html += "<div class='section'><h2>AI Prediction (LSTM)</h2>";
+html += "<div class='section'><h2>AI Prediction (XGBoost + LightGBM)</h2>";
   if (predictionReady) {
     html += "<div class='bill-grid'>";
     html += "<div class='ai-card'><div class='aval'>" + String(predictedPower,1)  + " W</div><div class='albl'>Predicted Power</div></div>";
