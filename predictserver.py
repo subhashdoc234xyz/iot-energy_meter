@@ -245,36 +245,57 @@ def home():
 
 @app.route('/predict', methods=['GET'])
 def predict_next_hour():
-    """Predict next hour's power consumption and runtime"""
-    
+    """Predict next hour's power consumption and runtime.
+    Returns FLAT keys so ESP32 ArduinoJson can read them directly.
+    """
+
     result = predict_next_hours(1)
     if result is None:
         return jsonify({
             'error': 'Insufficient data. Need at least 50 records in energy_data.csv',
-            'status': 'error'
+            'status': 'error',
+            # Flat fallback keys so ESP32 does not crash
+            'predicted_power_w':   0,
+            'predicted_bill_1h':   0,
+            'predicted_bill_1d':   0,
+            'predicted_kwh_1d':    0,
+            'predicted_run_hour':  0,
+            'predicted_run_day':   0,
+            'predicted_run_week':  0,
+            'predicted_run_month': 0,
         }), 200
-    
+
     power_w, run_min = result
-    bill_1h, kwh_1h = calculate_bill(power_w, 1)
-    bill_1d, kwh_1d = calculate_bill(power_w, 24)
-    
-    runtime = run_time_breakdown(run_min)
-    
+    bill_1h, kwh_1h  = calculate_bill(power_w, 1)
+    bill_1d, kwh_1d  = calculate_bill(power_w, 24)
+    runtime          = run_time_breakdown(run_min)
+
     return jsonify({
-        'status': 'success',
+        # ── FLAT keys — read directly by ESP32 fetchPrediction() ──
+        'predicted_power_w':   round(power_w, 2),
+        'predicted_bill_1h':   bill_1h,
+        'predicted_bill_1d':   bill_1d,
+        'predicted_kwh_1d':    kwh_1d,
+        'predicted_run_hour':  runtime['per_hour_hr'],
+        'predicted_run_day':   runtime['per_day_hr'],
+        'predicted_run_week':  runtime['per_week_hr'],
+        'predicted_run_month': runtime['per_month_hr'],
+        'predicted_run_min_per_hour': runtime['per_hour_min'],
+        # ── Nested keys kept for dashboard / browser use ──
+        'status':    'success',
         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'prediction': {
-            'power_w': round(power_w, 2),
-            'power_kw': round(power_w / 1000, 3),
+            'power_w':              round(power_w, 2),
+            'power_kw':             round(power_w / 1000, 3),
             'run_time_min_per_hour': round(run_min, 2),
             'cost_estimate': {
-                'next_hour_rs': bill_1h,
+                'next_hour_rs':  bill_1h,
                 'next_hour_kwh': kwh_1h,
-                'next_24h_rs': bill_1d,
-                'next_24h_kwh': kwh_1d
+                'next_24h_rs':   bill_1d,
+                'next_24h_kwh':  kwh_1d,
             },
-            'runtime_breakdown': runtime
-        }
+            'runtime_breakdown': runtime,
+        },
     })
 
 @app.route('/predict/day', methods=['GET'])
@@ -688,23 +709,23 @@ if __name__ == '__main__':
     print(f"✓ Ready to serve predictions")
     
     print("\n📡 Access the server at:")
-    print(f"   • Local:    http://localhost:5002")
-    print(f"   • Network:  http://{local_ip}:5002")
+    print(f"   • Local:    http://localhost:5001")
+    print(f"   • Network:  http://{local_ip}:5001")
     
     print("\n🔗 Available endpoints:")
-    print(f"   • Home:       http://{local_ip}:5002/")
-    print(f"   • Predict:    http://{local_ip}:5002/predict")
-    print(f"   • Day View:   http://{local_ip}:5002/predict/day")
-    print(f"   • Week View:  http://{local_ip}:5002/predict/week")
-    print(f"   • Dashboard:  http://{local_ip}:5002/dashboard")
-    print(f"   • Status:     http://{local_ip}:5002/status")
+    print(f"   • Home:       http://{local_ip}:5001/")
+    print(f"   • Predict:    http://{local_ip}:5001/predict  ← ESP32 calls this")
+    print(f"   • Day View:   http://{local_ip}:5001/predict/day")
+    print(f"   • Week View:  http://{local_ip}:5001/predict/week")
+    print(f"   • Dashboard:  http://{local_ip}:5001/dashboard")
+    print(f"   • Status:     http://{local_ip}:5001/status")
     
     print("\n💡 Quick test:")
-    print(f"   curl http://localhost:5002/predict")
+    print(f"   curl http://localhost:5001/predict")
     
     print("\n" + "=" * 60)
     print("  Server is running... Press Ctrl+C to stop")
     print("=" * 60 + "\n")
     
     # Run Flask app
-    app.run(host='0.0.0.0', port=5002, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=5001, debug=False, threaded=True)
