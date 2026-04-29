@@ -398,471 +398,243 @@ String buildDashboardHTML() {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="5">
 <title>WattBot Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #050505;
-    --surface: rgba(20, 20, 25, 0.6);
-    --border: rgba(255, 255, 255, 0.08);
-    --accent-1: #00f0ff;
-    --accent-2: #7000ff;
-    --success: #00ff9d;
-    --warning: #ffb800;
-    --danger: #ff003c;
-    --text-main: #ffffff;
-    --text-muted: #8892b0;
+    --bg: #050505; --surface: rgba(20, 20, 25, 0.6); --border: rgba(255, 255, 255, 0.08);
+    --accent-1: #00f0ff; --accent-2: #7000ff; --success: #00ff9d; --warning: #ffb800; --danger: #ff003c;
+    --text-main: #ffffff; --text-muted: #8892b0;
   }
-  
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body {
-    background-color: var(--bg);
-    color: var(--text-main);
-    font-family: 'Outfit', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* Animated Background Elements */
-  .bg-orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    z-index: -1;
-    opacity: 0.5;
-    animation: drift 20s infinite alternate ease-in-out;
-  }
-  .orb-1 { width: 400px; height: 400px; background: rgba(0, 240, 255, 0.15); top: -100px; left: -100px; }
-  .orb-2 { width: 500px; height: 500px; background: rgba(112, 0, 255, 0.15); bottom: -150px; right: -100px; animation-delay: -5s; }
-  .orb-3 { width: 300px; height: 300px; background: rgba(0, 255, 157, 0.1); top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
-
-  @keyframes drift {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(50px, 30px) scale(1.1); }
-  }
-
-  .container {
-    max-width: 1200px;
-    width: 100%;
-    z-index: 1;
-  }
-
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 3rem;
-    position: relative;
-  }
-  
-  .logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 700;
-    letter-spacing: -1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 20px rgba(165, 180, 252, 0.3));
-    animation: pulse 4s infinite alternate;
-  }
-  
-  .logo span {
-    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .tagline {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
-    font-weight: 300;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  /* Layout */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .section-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  /* Glassmorphism Cards */
-  .card, .section {
-    background: var(--surface);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-  }
-  
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  }
-
-  .card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px -10px rgba(0,240,255,0.15);
-  }
-
-  /* Main Metrics */
-  .metric-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 2rem 1.5rem;
-  }
-  
-  .metric-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.8;
-  }
-
-  .metric-val {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-main);
-    line-height: 1.1;
-    margin: 0.5rem 0;
-    text-shadow: 0 0 20px rgba(255,255,255,0.1);
-  }
-
-  .metric-val span {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin-left: 4px;
-  }
-
-  .metric-lbl {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-weight: 600;
-  }
-
-  /* Specific Metric Colors */
-  .metric-v .metric-val { color: #a78bfa; }
-  .metric-a .metric-val { color: #38bdf8; }
-  .metric-w .metric-val { color: #fbbf24; }
-  .metric-k .metric-val { color: #34d399; }
-
-  /* Sections */
-  .section-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title::before {
-    content: '';
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--accent-1);
-    box-shadow: 0 0 10px var(--accent-1);
-  }
-
-  .section-title.ai-title::before {
-    background: var(--accent-2);
-    box-shadow: 0 0 10px var(--accent-2);
-  }
-
-  /* Data Grids */
-  .data-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .data-item {
-    background: rgba(0,0,0,0.2);
-    border-radius: 16px;
-    padding: 1.2rem;
-    border: 1px solid rgba(255,255,255,0.03);
-    transition: all 0.3s ease;
-  }
-
-  .data-item:hover {
-    background: rgba(255,255,255,0.03);
-    transform: translateY(-2px);
-  }
-
-  .data-val {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
-  }
-
-  .data-lbl {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-  }
-
-  /* Bill Colors */
+  body { background: var(--bg); color: var(--text-main); font-family: 'Outfit', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem; overflow-x: hidden; }
+  .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.5; animation: drift 20s infinite alternate ease-in-out; }
+  .orb-1 { width: 40vw; height: 40vw; background: rgba(0, 240, 255, 0.15); top: -10vw; left: -10vw; }
+  .orb-2 { width: 50vw; height: 50vw; background: rgba(112, 0, 255, 0.15); bottom: -15vw; right: -10vw; animation-delay: -5s; }
+  @keyframes drift { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+  .container { max-width: 1200px; width: 100%; z-index: 1; animation: fadeIn 1s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .header { text-align: center; margin-bottom: 3rem; animation: slideDown 0.8s ease-out backwards; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-size: 3.5rem; font-weight: 700; background: linear-gradient(135deg, #fff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(165, 180, 252, 0.3)); animation: pulse 4s infinite alternate; }
+  .logo span { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .tagline { color: var(--text-muted); font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 0.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+  .section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+  .card, .section { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 24px; padding: 1.5rem; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); position: relative; overflow: hidden; animation: slideUp 0.6s ease-out backwards; }
+  @keyframes slideUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
+  .grid .card:nth-child(1) { animation-delay: 0.1s; } .grid .card:nth-child(2) { animation-delay: 0.2s; } .grid .card:nth-child(3) { animation-delay: 0.3s; }
+  .grid .card:nth-child(4) { animation-delay: 0.4s; } .grid .card:nth-child(5) { animation-delay: 0.5s; } .grid .card:nth-child(6) { animation-delay: 0.6s; }
+  .section-grid .section:nth-child(1) { animation-delay: 0.3s; } .section-grid .section:nth-child(2) { animation-delay: 0.5s; } .section-grid .section:nth-child(3) { animation-delay: 0.7s; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); }
+  .card::after, .section::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%); transform: rotate(45deg) translateY(-100%); transition: transform 0.6s ease-in-out; pointer-events: none; z-index: 0; }
+  .card:hover::after, .section:hover::after { transform: rotate(45deg) translateY(100%); }
+  .card:hover { transform: translateY(-8px); border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 20px 40px -10px rgba(0,240,255,0.25); }
+  .metric-card { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem 1.5rem; z-index: 1; }
+  .metric-icon { font-size: 1.5rem; opacity: 0.9; margin-bottom: 0.5rem; animation: floatIcon 3s ease-in-out infinite; }
+  @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 2.5rem; font-weight: 700; text-shadow: 0 0 20px rgba(255,255,255,0.1); margin: 0.5rem 0; line-height: 1.1; color: var(--text-main); position: relative; z-index: 1; }
+  .metric-val span { font-size: 1.2rem; color: var(--text-muted); font-weight: 500; margin-left: 4px; }
+  .metric-lbl { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1.5px; position: relative; z-index: 1; }
+  .metric-v .metric-val { color: #a78bfa; } .metric-a .metric-val { color: #38bdf8; } .metric-w .metric-val { color: #fbbf24; } .metric-k .metric-val { color: #34d399; }
+  .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+  .section-title::before { content: ''; display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-1); box-shadow: 0 0 10px var(--accent-1); animation: pulseGlow 2s infinite alternate; }
+  .section-title.ai-title::before { background: var(--accent-2); box-shadow: 0 0 10px var(--accent-2); }
+  @keyframes pulseGlow { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
+  .data-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; position: relative; z-index: 1; }
+  .data-item { background: rgba(0,0,0,0.2); border-radius: 16px; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.03); transition: all 0.3s ease; }
+  .data-item:hover { background: rgba(255,255,255,0.03); transform: translateY(-4px) scale(1.02); border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
+  .data-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; transition: color 0.3s; }
+  .data-lbl { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
   .bill-item .data-val { color: var(--success); }
   .ai-item .data-val { background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-  /* Rate Form */
-  .rate-form {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .rate-form input {
-    flex: 1;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 0.8rem 1.2rem;
-    color: white;
-    font-family: 'Outfit', sans-serif;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    outline: none;
-  }
-
-  .rate-form input:focus {
-    border-color: var(--accent-1);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-  }
-
-  .rate-form button {
-    background: linear-gradient(135deg, var(--accent-1), #0077ff);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    padding: 0 1.5rem;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
-  }
-
-  .rate-form button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
-  }
-
-  /* Appliance Status */
-  .status-badge {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 1.2rem;
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
-  }
-
-  .status-on {
-    background: rgba(0, 255, 157, 0.1);
-    border: 1px solid rgba(0, 255, 157, 0.2);
-    color: var(--success);
-  }
-
-  .status-off {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-muted);
-  }
-
-  .pulse-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-  }
-
-  .status-on .pulse-dot {
-    background: var(--success);
-    box-shadow: 0 0 12px var(--success);
-    animation: blink 1.5s infinite;
-  }
-
-  .status-off .pulse-dot {
-    background: var(--text-muted);
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .footer-status {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 3rem;
-    padding: 1.5rem;
-    background: var(--surface);
-    border-radius: 100px;
-    border: 1px solid var(--border);
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .status-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .status-ok { color: var(--success); }
-  .status-err { color: var(--danger); }
-  .status-ip { color: var(--accent-1); }
-
-  @media (max-width: 768px) {
-    .section-grid { grid-template-columns: 1fr; }
-    .footer-status { flex-direction: column; gap: 1rem; border-radius: 24px; text-align: center; }
-  }
+  .status-badge { display: flex; align-items: center; gap: 12px; padding: 1.2rem; border-radius: 16px; margin-bottom: 1.5rem; font-weight: 600; font-size: 1.1rem; letter-spacing: 0.5px; transition: all 0.5s; position: relative; z-index: 1; }
+  .status-on { background: rgba(0, 255, 157, 0.1); border: 1px solid rgba(0, 255, 157, 0.2); color: var(--success); box-shadow: 0 0 20px rgba(0,255,157,0.1); }
+  .status-off { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+  .pulse-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .status-on .pulse-dot { background: var(--success); box-shadow: 0 0 12px var(--success); animation: blink 1.5s infinite; }
+  .status-off .pulse-dot { background: var(--text-muted); }
+  @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .footer-status { display: flex; justify-content: center; gap: 2rem; margin-top: 3rem; padding: 1.5rem; background: var(--surface); border-radius: 100px; border: 1px solid var(--border); font-size: 0.9rem; font-weight: 500; animation: fadeIn 1.5s ease-out backwards; animation-delay: 1s; }
+  .status-item { display: flex; align-items: center; gap: 8px; }
+  .status-ok { color: var(--success); } .status-err { color: var(--danger); }
+  .rate-form { display: flex; gap: 1rem; margin-top: 1.5rem; position: relative; z-index: 1; }
+  .rate-form input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.8rem 1.2rem; color: white; font-family: 'Outfit', sans-serif; font-size: 1rem; outline: none; transition: all 0.3s; }
+  .rate-form input:focus { border-color: var(--accent-1); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); background: rgba(0,0,0,0.5); }
+  .rate-form button { background: linear-gradient(135deg, var(--accent-1), #0077ff); color: #000; border: none; border-radius: 12px; padding: 0 1.5rem; font-weight: 700; font-family: 'Outfit', sans-serif; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3); position: relative; overflow: hidden; }
+  .rate-form button::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%); transform: rotate(45deg) translateY(-100%); transition: transform 0.4s ease-in-out; }
+  .rate-form button:hover::after { transform: rotate(45deg) translateY(100%); }
+  .rate-form button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5); }
+  @media (max-width: 768px) { .section-grid { grid-template-columns: 1fr; } .footer-status { flex-direction: column; gap: 1rem; border-radius: 24px; text-align: center; } }
+  
+  /* Loading animation */
+  .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--accent-1); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; margin-top: 10px; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .fade-update { animation: highlight 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  @keyframes highlight { 0% { color: var(--accent-1); text-shadow: 0 0 15px var(--accent-1); transform: scale(1.1); } 100% { transform: scale(1); } }
 </style>
 </head>
 <body>
-
-<div class="bg-orb orb-1"></div>
-<div class="bg-orb orb-2"></div>
-<div class="bg-orb orb-3"></div>
-
+<div class="bg-orb orb-1"></div><div class="bg-orb orb-2"></div><div class="bg-orb orb-3"></div>
 <div class="container">
   <div class="header">
     <div class="logo">Watt<span>Bot</span> ⚡</div>
     <div class="tagline">Next-Gen Energy Intelligence</div>
   </div>
 
-)rawliteral";
-
-  // Live readings
-  html += "<div class='grid'>";
-  html += "<div class='card metric-card metric-v'><div class='metric-icon'>⚡</div><div class='metric-val'>" + String(voltage,1)     + "<span>V</span></div><div class='metric-lbl'>Voltage</div></div>";
-  html += "<div class='card metric-card metric-a'><div class='metric-icon'>🌊</div><div class='metric-val'>" + String(current,2)     + "<span>A</span></div><div class='metric-lbl'>Current</div></div>";
-  html += "<div class='card metric-card metric-w'><div class='metric-icon'>🔥</div><div class='metric-val'>" + String(power,1)       + "<span>W</span></div><div class='metric-lbl'>Power</div></div>";
-  html += "<div class='card metric-card metric-k'><div class='metric-icon'>📈</div><div class='metric-val'>" + String(energy,3)      + "<span>kWh</span></div><div class='metric-lbl'>Energy</div></div>";
-  html += "<div class='card metric-card'><div class='metric-icon'>〰️</div><div class='metric-val'>" + String(frequency,1)   + "<span>Hz</span></div><div class='metric-lbl'>Frequency</div></div>";
-  html += "<div class='card metric-card'><div class='metric-icon'>📐</div><div class='metric-val'>" + String(powerFactor,2) + "</div><div class='metric-lbl'>Power Factor</div></div>";
-  html += "</div>";
-
-  html += "<div class='section-grid'>";
-  
-  // Bill estimates
-  html += "<div class='section'><div class='section-title'>Bill Estimate (Rs." + String(ratePerUnit,1) + "/kWh)</div>";
-  html += "<div class='data-grid'>";
-  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,1),2)   + "</div><div class='data-lbl'>1 Hour</div></div>";
-  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,24),2)  + "</div><div class='data-lbl'>1 Day</div></div>";
-  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,168),2) + "</div><div class='data-lbl'>7 Days</div></div>";
-  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,720),2) + "</div><div class='data-lbl'>30 Days</div></div>";
-  html += "</div>";
-  html += R"rawliteral(
-  <div class="rate-form">
-    <input type="number" id="rI" placeholder="New rate (Rs/kWh)" step="0.1" min="0.1" max="50" inputmode="decimal">
-    <button onclick="var r=document.getElementById('rI').value;if(r>0&&r<=50)window.location.href='/setrate?rate='+r;else alert('Enter a valid rate between 0.1 and 50');">Update</button>
+  <div class="grid">
+    <div class="card metric-card metric-v"><div class="metric-icon">⚡</div><div class="metric-val" id="val-v"><div class="loader"></div></div><div class="metric-lbl">Voltage</div></div>
+    <div class="card metric-card metric-a"><div class="metric-icon">🌊</div><div class="metric-val" id="val-a"><div class="loader"></div></div><div class="metric-lbl">Current</div></div>
+    <div class="card metric-card metric-w"><div class="metric-icon">🔥</div><div class="metric-val" id="val-w"><div class="loader"></div></div><div class="metric-lbl">Power</div></div>
+    <div class="card metric-card metric-k"><div class="metric-icon">📈</div><div class="metric-val" id="val-k"><div class="loader"></div></div><div class="metric-lbl">Energy</div></div>
+    <div class="card metric-card"><div class="metric-icon">〰️</div><div class="metric-val" id="val-f"><div class="loader"></div></div><div class="metric-lbl">Frequency</div></div>
+    <div class="card metric-card"><div class="metric-icon">📐</div><div class="metric-val" id="val-pf"><div class="loader"></div></div><div class="metric-lbl">Power Factor</div></div>
   </div>
-  </div>)rawliteral";
 
-  // Appliance Running Time
-  html += "<div class='section'><div class='section-title'>Appliance Tracking</div>";
-  if (applianceOn) {
-    html += "<div class='status-badge status-on'><div class='pulse-dot'></div>Active — Currently Running</div>";
-  } else {
-    html += "<div class='status-badge status-off'><div class='pulse-dot'></div>Standby — Powered Off</div>";
-  }
-  html += "<div class='data-grid' style='margin-bottom: 1rem;'>";
-  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + formatRunTime(runTimePerHour)         + "</div><div class='data-lbl'>Per Hour</div></div>";
-  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + String(runTimePerDay, 1) + "h"     + "</div><div class='data-lbl'>Per Day</div></div>";
-  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + String(runTimePerWeek, 1) + "h"    + "</div><div class='data-lbl'>Per Week</div></div>";
-  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + String(runTimePerMonth, 1) + "h"   + "</div><div class='data-lbl'>Per Month</div></div>";
-  html += "</div>";
-  html += "<div style='color:var(--text-muted);font-size:0.85rem;text-align:center;'>Total session ON time: <span style='color:#fb923c;font-weight:700;'>" + formatRunTime(runTimeTotalSec) + "</span> | Threshold: >" + String(APPLIANCE_ON_THRESHOLD,0) + "W</div>";
-  html += "</div>";
+  <div class="section-grid">
+    <div class="section">
+      <div class="section-title">Bill Estimate <span id="val-rate-title" style="font-size: 0.9rem; color: var(--text-muted); margin-left: 10px;"></span></div>
+      <div class="data-grid">
+        <div class="data-item bill-item"><div class="data-val" id="bill-1h">--</div><div class="data-lbl">1 Hour</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-1d">--</div><div class="data-lbl">1 Day</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-7d">--</div><div class="data-lbl">7 Days</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-30d">--</div><div class="data-lbl">30 Days</div></div>
+      </div>
+      <div class="rate-form">
+        <input type="number" id="rI" placeholder="New rate (Rs/kWh)" step="0.1" min="0.1" max="50" inputmode="decimal">
+        <button onclick="updateRate()">Update</button>
+      </div>
+    </div>
 
-  // AI Prediction
-  html += "<div class='section' style='grid-column: 1 / -1;'><div class='section-title ai-title'>AI Forecaster (XGBoost + LightGBM)</div>";
-  if (predictionReady) {
-    html += "<div class='data-grid' style='grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem;'>";
-    html += "<div class='data-item ai-item'><div class='data-val'>" + String(predictedPower,1)  + " W</div><div class='data-lbl'>Predicted Power</div></div>";
-    html += "<div class='data-item ai-item'><div class='data-val'>Rs." + String(predictedBill1h,2) + "</div><div class='data-lbl'>Predicted / Hour</div></div>";
-    html += "<div class='data-item ai-item'><div class='data-val'>Rs." + String(predictedBill1d,2) + "</div><div class='data-lbl'>Predicted / Day</div></div>";
-    html += "<div class='data-item ai-item'><div class='data-val'>" + String(predictedKwh1d,3)  + " kWh</div><div class='data-lbl'>Predicted kWh / Day</div></div>";
-    html += "</div>";
-    
-    html += "<div class='data-lbl' style='margin-bottom: 1rem; color:var(--accent-2);'>AI Predicted Running Time</div>";
-    html += "<div class='data-grid' style='grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));'>";
-    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunHour*60,0)  + "m</div><div class='data-lbl'>Per Hour</div></div>";
-    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunDay,1)      + "h</div><div class='data-lbl'>Per Day</div></div>";
-    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunWeek,1)     + "h</div><div class='data-lbl'>Per Week</div></div>";
-    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunMonth,1)    + "h</div><div class='data-lbl'>Per Month</div></div>";
-    html += "</div>";
-    html += "<div style='color:var(--text-muted);font-size:0.85rem;text-align:right;margin-top:1rem;'>Last updated: " + predictionTime + "</div>";
-  } else {
-    html += "<div style='padding: 3rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);'>";
-    html += "<div class='pulse-dot' style='background: var(--accent-2); box-shadow: 0 0 15px var(--accent-2); margin: 0 auto 1rem;'></div>";
-    html += "<div style='font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.5rem;'>Awaiting Intelligence</div>";
-    html += "<div style='color: var(--text-muted); font-size: 0.9rem;'>Start predict_server.py on the master node</div>";
-    html += "</div>";
-  }
-  html += "</div>";
+    <div class="section">
+      <div class="section-title">Appliance Tracking</div>
+      <div id="app-status" class="status-badge status-off"><div class="pulse-dot"></div><span id="app-status-txt">Standby — Powered Off</span></div>
+      <div class="data-grid" style="margin-bottom: 1rem;">
+        <div class="data-item"><div class="data-val" id="run-1h" style="color:#fb923c;">--</div><div class="data-lbl">Per Hour</div></div>
+        <div class="data-item"><div class="data-val" id="run-1d" style="color:#fb923c;">--</div><div class="data-lbl">Per Day</div></div>
+        <div class="data-item"><div class="data-val" id="run-7d" style="color:#fb923c;">--</div><div class="data-lbl">Per Week</div></div>
+        <div class="data-item"><div class="data-val" id="run-30d" style="color:#fb923c;">--</div><div class="data-lbl">Per Month</div></div>
+      </div>
+      <div style="color:var(--text-muted);font-size:0.85rem;text-align:center;">Total session ON time: <span id="run-total" style="color:#fb923c;font-weight:700;">--</span></div>
+    </div>
+
+    <div class="section" style="grid-column: 1 / -1;">
+      <div class="section-title ai-title">AI Forecaster (XGBoost + LightGBM)</div>
+      <div id="ai-content">
+        <div style="padding: 3rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);">
+          <div class="pulse-dot" style="background: var(--accent-2); box-shadow: 0 0 15px var(--accent-2); margin: 0 auto 1rem;"></div>
+          <div style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.5rem;">Awaiting Intelligence</div>
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Start predict_server.py on the master node</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-status">
+    <div class="status-item">Sensor: <span id="status-sensor" class="status-err">OFFLINE</span></div>
+    <div class="status-item">Network: <span id="status-ip" style="color:var(--accent-1);">...</span></div>
+    <div class="status-item">Sync: <span style="color:var(--text-main);">5s Interval (Live)</span></div>
+  </div>
   
-  html += "</div>"; // End section-grid
+  <div style="text-align:center; margin-top: 2rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; letter-spacing: 1px;">
+    Powered by <span style="color: var(--accent-1); font-weight: 700;">WattBot</span> ⚡ Intelligent Energy
+  </div>
+</div>
 
-  html += "<div class='footer-status'>";
-  html += "<div class='status-item'>Sensor: <span class='" + String(sensorOk ? "status-ok" : "status-err") + "'>" + String(sensorOk ? "ONLINE" : "OFFLINE") + "</span></div>";
-  html += "<div class='status-item'>Network: <span class='status-ip'>" + WiFi.localIP().toString() + "</span></div>";
-  html += "<div class='status-item'>Sync: <span style='color:var(--text-main);'>5s Interval</span></div>";
-  html += "</div>";
+<script>
+function formatTime(sec) {
+  if (sec < 60) return Math.floor(sec) + "s";
+  if (sec < 3600) return Math.floor(sec/60) + "m " + Math.floor(sec%60) + "s";
+  return Math.floor(sec/3600) + "h " + Math.floor((sec%3600)/60) + "m";
+}
+function updateText(id, newHTML) {
+  const el = document.getElementById(id);
+  if (el.innerHTML !== newHTML) {
+    el.innerHTML = newHTML;
+    el.classList.remove('fade-update');
+    void el.offsetWidth; // trigger reflow
+    el.classList.add('fade-update');
+  }
+}
+function updateData() {
+  fetch('/data').then(r => r.json()).then(d => {
+    updateText('val-v', d.voltage.toFixed(1) + "<span>V</span>");
+    updateText('val-a', d.current.toFixed(2) + "<span>A</span>");
+    updateText('val-w', d.power.toFixed(1) + "<span>W</span>");
+    updateText('val-k', d.energy.toFixed(3) + "<span>kWh</span>");
+    updateText('val-f', d.frequency.toFixed(1) + "<span>Hz</span>");
+    updateText('val-pf', d.power_factor.toFixed(2));
+    
+    document.getElementById('val-rate-title').innerText = "(Rs." + d.rate.toFixed(1) + "/kWh)";
+    updateText('bill-1h', "Rs." + d.bill_1h.toFixed(2));
+    updateText('bill-1d', "Rs." + d.bill_1d.toFixed(2));
+    updateText('bill-7d', "Rs." + (d.bill_1d * 7).toFixed(2));
+    updateText('bill-30d', "Rs." + (d.bill_1d * 30).toFixed(2));
 
-  html += "<div style='text-align:center; margin-top: 2rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; letter-spacing: 1px;'>";
-  html += "Powered by <span style='color: var(--accent-1); font-weight: 700;'>WattBot</span> ⚡ Intelligent Energy";
-  html += "</div>";
+    const appStatus = document.getElementById('app-status');
+    const appTxt = document.getElementById('app-status-txt');
+    if (d.appliance_on) {
+      if(appStatus.className !== "status-badge status-on") {
+        appStatus.className = "status-badge status-on";
+        appTxt.innerText = "Active — Currently Running";
+      }
+    } else {
+      if(appStatus.className !== "status-badge status-off") {
+        appStatus.className = "status-badge status-off";
+        appTxt.innerText = "Standby — Powered Off";
+      }
+    }
 
-  html += "</div>"; // End container
-  html += "</body></html>";
+    updateText('run-1h', formatTime(d.run_per_hour_min * 60));
+    updateText('run-1d', d.run_per_day_h.toFixed(1) + "h");
+    updateText('run-7d', d.run_per_week_h.toFixed(1) + "h");
+    updateText('run-30d', d.run_per_month_h.toFixed(1) + "h");
+    updateText('run-total', formatTime(d.run_total_sec));
+
+    if (d.ai_prediction && d.ai_prediction.ready) {
+      const ai = d.ai_prediction;
+      const aiHTML = `
+        <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem;">
+          <div class="data-item ai-item"><div class="data-val">${ai.power_w.toFixed(1)} W</div><div class="data-lbl">Predicted Power</div></div>
+          <div class="data-item ai-item"><div class="data-val">Rs.${ai.bill_1h.toFixed(2)}</div><div class="data-lbl">Predicted / Hour</div></div>
+          <div class="data-item ai-item"><div class="data-val">Rs.${ai.bill_1d.toFixed(2)}</div><div class="data-lbl">Predicted / Day</div></div>
+          <div class="data-item ai-item"><div class="data-val">${ai.kwh_1d.toFixed(3)} kWh</div><div class="data-lbl">Predicted kWh / Day</div></div>
+        </div>
+        <div class="data-lbl" style="margin-bottom: 1rem; color:var(--accent-2);">AI Predicted Running Time</div>
+        <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+          <div class="data-item"><div class="data-val" style="color:#a78bfa;">${(ai.run_hour*60).toFixed(0)}m</div><div class="data-lbl">Per Hour</div></div>
+          <div class="data-item"><div class="data-val" style="color:#a78bfa;">${ai.run_day.toFixed(1)}h</div><div class="data-lbl">Per Day</div></div>
+          <div class="data-item"><div class="data-val" style="color:#a78bfa;">${ai.run_week.toFixed(1)}h</div><div class="data-lbl">Per Week</div></div>
+          <div class="data-item"><div class="data-val" style="color:#a78bfa;">${ai.run_month.toFixed(1)}h</div><div class="data-lbl">Per Month</div></div>
+        </div>
+        <div style="color:var(--text-muted);font-size:0.85rem;text-align:right;margin-top:1rem;">Last updated: ${ai.updated}</div>
+      `;
+      if (document.getElementById('ai-content').innerHTML !== aiHTML) {
+          document.getElementById('ai-content').innerHTML = aiHTML;
+      }
+    }
+
+    const sSensor = document.getElementById('status-sensor');
+    if (d.sensor_ok) {
+      if(sSensor.innerText !== "ONLINE") { sSensor.className = "status-ok"; sSensor.innerText = "ONLINE"; }
+    } else {
+      if(sSensor.innerText !== "OFFLINE") { sSensor.className = "status-err"; sSensor.innerText = "OFFLINE"; }
+    }
+    
+    document.getElementById('status-ip').innerText = window.location.hostname;
+  }).catch(e => console.log('Fetch error:', e));
+}
+function updateRate() {
+  const r = document.getElementById('rI').value;
+  if(r>0 && r<=50) window.location.href = '/setrate?rate=' + r;
+  else alert('Enter a valid rate between 0.1 and 50');
+}
+setInterval(updateData, 5000);
+updateData();
+</script>
+</body>
+</html>
+)rawliteral";
   return html;
 }
 
