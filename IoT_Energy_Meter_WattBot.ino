@@ -399,230 +399,469 @@ String buildDashboardHTML() {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="refresh" content="5">
-<title>WattBot</title>
+<title>WattBot Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-  @keyframes gradientShift { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
-  @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
-  @keyframes pulseGlow { 0%,100%{box-shadow:0 0 20px rgba(56,189,248,0.3)}50%{box-shadow:0 0 35px rgba(56,189,248,0.6)} }
-  @keyframes shimmer { 0%{background-position:-200% 0}100%{background-position:200% 0} }
-  @keyframes tickPulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-  @keyframes logoGlow { 0%,100%{filter:drop-shadow(0 0 8px rgba(56,189,248,0.7))}50%{filter:drop-shadow(0 0 20px rgba(56,189,248,1))} }
-
+  :root {
+    --bg: #050505;
+    --surface: rgba(20, 20, 25, 0.6);
+    --border: rgba(255, 255, 255, 0.08);
+    --accent-1: #00f0ff;
+    --accent-2: #7000ff;
+    --success: #00ff9d;
+    --warning: #ffb800;
+    --danger: #ff003c;
+    --text-main: #ffffff;
+    --text-muted: #8892b0;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
   body {
-    background: linear-gradient(-45deg,#0f172a,#1e293b,#0f172a,#172554);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-    color: #f1f5f9; padding: 20px; min-height: 100vh; overflow-x: hidden;
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    position: relative;
+    overflow-x: hidden;
   }
-  body::before, body::after {
-    content:''; position:fixed; width:300px; height:300px; border-radius:50%;
-    filter:blur(80px); z-index:-1; opacity:0.4; animation:float 8s ease-in-out infinite;
-  }
-  body::before { background:radial-gradient(circle,rgba(56,189,248,0.4),transparent 70%); top:-100px; right:-100px; }
-  body::after  { background:radial-gradient(circle,rgba(16,185,129,0.3),transparent 70%); bottom:-100px; left:-100px; animation-delay:-4s; }
 
-  /* ── WattBot Header ── */
-  .header { text-align:center; margin:10px 0 28px; }
+  /* Animated Background Elements */
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.5;
+    animation: drift 20s infinite alternate ease-in-out;
+  }
+  .orb-1 { width: 400px; height: 400px; background: rgba(0, 240, 255, 0.15); top: -100px; left: -100px; }
+  .orb-2 { width: 500px; height: 500px; background: rgba(112, 0, 255, 0.15); bottom: -150px; right: -100px; animation-delay: -5s; }
+  .orb-3 { width: 300px; height: 300px; background: rgba(0, 255, 157, 0.1); top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
+
+  @keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 30px) scale(1.1); }
+  }
+
+  .container {
+    max-width: 1200px;
+    width: 100%;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  
   .logo {
-    font-size:2.8rem; font-weight:900; letter-spacing:3px;
-    background:linear-gradient(135deg,#38bdf8,#22d3ee,#7dd3fc,#38bdf8);
-    background-size:200% auto;
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    animation:shimmer 3s linear infinite, logoGlow 3s ease-in-out infinite;
-    display:inline-block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(165, 180, 252, 0.3));
+    animation: pulse 4s infinite alternate;
   }
-  .logo .bot {
-    background:linear-gradient(135deg,#10b981,#34d399,#10b981);
-    background-size:200% auto;
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    animation:shimmer 3s linear infinite;
+  
+  .logo span {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
-  .bolt {
-    display:inline-block; font-size:2.2rem; margin:0 4px;
-    -webkit-text-fill-color:#facc15;
-    filter:drop-shadow(0 0 8px rgba(250,204,21,0.9));
-    animation:tickPulse 1.2s ease-in-out infinite;
-  }
+
   .tagline {
-    font-size:0.82rem; color:#64748b; font-weight:600;
-    letter-spacing:3px; text-transform:uppercase; margin-top:6px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
   }
 
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:18px; margin-bottom:24px; }
-
-  .card, .section, .bill-item, .ai-card, .run-item {
-    background:rgba(30,41,59,0.55);
-    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,0.12);
-    border-top:1px solid rgba(255,255,255,0.25);
-    border-left:1px solid rgba(255,255,255,0.18);
-    border-radius:20px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);
-    transition:all 0.3s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden;
+  /* Layout */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
   }
-  .card::before,.section::before,.bill-item::before,.ai-card::before,.run-item::before {
-    content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
-    transition:left 0.6s ease; pointer-events:none;
-  }
-  .card:hover::before,.section:hover::before,.bill-item:hover::before,.ai-card:hover::before,.run-item:hover::before { left:100%; }
-  .card { padding:22px 18px; text-align:center; border-bottom:3px solid rgba(56,189,248,0.5);
-  }
-  .card:hover { transform:translateY(-5px) scale(1.02); border-color:rgba(56,189,248,0.7); z-index:2; }
-  .card .val { font-size:2rem; font-weight:800; color:#38bdf8; text-shadow:0 0 20px rgba(56,189,248,0.5);
-  }
-  .card .unit { font-size:0.9rem; color:#94a3b8; margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
-  .card .lbl  { font-size:0.95rem; color:#cbd5e1; margin-top:10px; font-weight:600; }
-
-  .section { padding:24px; margin-bottom:24px; border-left:4px solid rgba(56,189,248,0.6); }
-  .section h2 { font-size:1.3rem; margin-bottom:20px; font-weight:700; color:#7dd3fc; display:flex;
-  align-items:center; gap:8px; }
-  .section h2::before { content:''; width:8px; height:8px; background:#38bdf8; border-radius:50%; box-shadow:0 0 10px rgba(56,189,248,0.8); animation:pulseGlow 2s infinite;
+  
+  .section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
   }
 
-  .bill-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-  .bill-item,.ai-card,.run-item { padding:18px 14px; text-align:center; background:rgba(15,23,42,0.45); border:1px solid rgba(16,185,129,0.2); border-radius:16px;
+  /* Glassmorphism Cards */
+  .card, .section {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
   }
-  .bill-item:hover,.ai-card:hover,.run-item:hover { transform:translateY(-3px); border-color:rgba(16,185,129,0.5); }
-  .bill-item .bval,.ai-card .aval { font-size:1.5rem; font-weight:800; color:#10b981; text-shadow:0 0 15px rgba(16,185,129,0.4);
-  }
-  .bill-item .blbl,.ai-card .albl { font-size:0.8rem; color:#94a3b8; margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
-  }
-
-  .run-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:16px;
-  }
-  .run-item { border:1px solid rgba(251,146,60,0.25); }
-  .run-item:hover { border-color:rgba(251,146,60,0.5); }
-  .run-item .rval { font-size:1.4rem; font-weight:800; color:#fb923c;
-  text-shadow:0 0 12px rgba(251,146,60,0.4); }
-  .run-item .rlbl { font-size:0.78rem; color:#94a3b8; margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
-  .appliance-status { display:flex;
-  align-items:center; gap:10px; padding:14px 18px; border-radius:14px; margin-bottom:16px; font-weight:700; font-size:1.05rem; }
-  .appliance-on  { background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#10b981;
-  }
-  .appliance-off { background:rgba(148,163,184,0.1); border:1px solid rgba(148,163,184,0.25); color:#94a3b8; }
-  .status-dot { width:10px; height:10px; border-radius:50%;
-  }
-  .dot-on  { background:#10b981; box-shadow:0 0 10px #10b981; animation:tickPulse 1s infinite; }
-  .dot-off { background:#64748b;
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
   }
 
-  .ai-run-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:14px; }
-  .ai-run-item { padding:14px;
-  text-align:center; background:rgba(15,23,42,0.45); border:1px solid rgba(167,139,250,0.2); border-radius:14px; }
-  .ai-run-item:hover { border-color:rgba(167,139,250,0.5); transform:translateY(-2px); }
-  .ai-run-item .arval { font-size:1.3rem; font-weight:800; color:#a78bfa;
-  }
-  .ai-run-item .arlbl { font-size:0.75rem; color:#94a3b8; margin-top:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
-
-  .rate-form { display:flex; gap:12px; align-items:center; margin-top:20px; flex-wrap:wrap;
-  }
-  .rate-form input { flex:1; min-width:120px; padding:14px 18px; border-radius:14px; border:1px solid rgba(56,189,248,0.35); background:rgba(15,23,42,0.65); color:#38bdf8; font-size:1rem; font-weight:600; outline:none;
-  transition:all 0.25s ease; }
-  .rate-form input::placeholder { color:#475569; }
-  .rate-form input:focus { border-color:#38bdf8; box-shadow:0 0 0 3px rgba(56,189,248,0.2);
-  }
-  .rate-form button { padding:14px 24px; background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(56,189,248,0.15)); backdrop-filter:blur(10px); color:#f0f9ff; border:1px solid rgba(56,189,248,0.65); border-radius:14px; font-size:1rem; font-weight:700; cursor:pointer; transition:all 0.2s ease;
-  }
-  .rate-form button:hover { background:linear-gradient(135deg,rgba(14,165,233,0.35),rgba(56,189,248,0.25)); transform:translateY(-2px); }
-
-  .status { font-size:0.9rem; color:#64748b; text-align:center; margin-top:24px; font-weight:600; padding:12px; background:rgba(30,41,59,0.3); border-radius:12px;
-  border:1px solid rgba(255,255,255,0.08); }
-  .badge-ok  { color:#10b981; font-weight:700; }
-  .badge-err { color:#ef4444; font-weight:700;
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px -10px rgba(0,240,255,0.15);
   }
 
-  .footer { text-align:center; margin-top:24px; padding:14px; color:#334155; font-size:0.8rem; font-weight:600; letter-spacing:1px; }
-  .footer b { color:#38bdf8; }
+  /* Main Metrics */
+  .metric-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+  
+  .metric-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+  }
 
-  @media (max-width:480px) {
-    .grid { grid-template-columns:repeat(2,1fr); }
-    .bill-grid,.run-grid,.ai-run-grid { grid-template-columns:1fr;
-    }
-    .logo { font-size:2rem; }
-    .card .val { font-size:1.6rem;
-    }
+  .metric-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin: 0.5rem 0;
+    text-shadow: 0 0 20px rgba(255,255,255,0.1);
+  }
+
+  .metric-val span {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+
+  .metric-lbl {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+
+  /* Specific Metric Colors */
+  .metric-v .metric-val { color: #a78bfa; }
+  .metric-a .metric-val { color: #38bdf8; }
+  .metric-w .metric-val { color: #fbbf24; }
+  .metric-k .metric-val { color: #34d399; }
+
+  /* Sections */
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    box-shadow: 0 0 10px var(--accent-1);
+  }
+
+  .section-title.ai-title::before {
+    background: var(--accent-2);
+    box-shadow: 0 0 10px var(--accent-2);
+  }
+
+  /* Data Grids */
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .data-item {
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+    padding: 1.2rem;
+    border: 1px solid rgba(255,255,255,0.03);
+    transition: all 0.3s ease;
+  }
+
+  .data-item:hover {
+    background: rgba(255,255,255,0.03);
+    transform: translateY(-2px);
+  }
+
+  .data-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .data-lbl {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  /* Bill Colors */
+  .bill-item .data-val { color: var(--success); }
+  .ai-item .data-val { background: linear-gradient(90deg, var(--accent-1), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* Rate Form */
+  .rate-form {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .rate-form input {
+    flex: 1;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  .rate-form input:focus {
+    border-color: var(--accent-1);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+  }
+
+  .rate-form button {
+    background: linear-gradient(135deg, var(--accent-1), #0077ff);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 0 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+  }
+
+  .rate-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
+  }
+
+  /* Appliance Status */
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1.2rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .status-on {
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px solid rgba(0, 255, 157, 0.2);
+    color: var(--success);
+  }
+
+  .status-off {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+  }
+
+  .pulse-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .status-on .pulse-dot {
+    background: var(--success);
+    box-shadow: 0 0 12px var(--success);
+    animation: blink 1.5s infinite;
+  }
+
+  .status-off .pulse-dot {
+    background: var(--text-muted);
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .footer-status {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: var(--surface);
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-ok { color: var(--success); }
+  .status-err { color: var(--danger); }
+  .status-ip { color: var(--accent-1); }
+
+  @media (max-width: 768px) {
+    .section-grid { grid-template-columns: 1fr; }
+    .footer-status { flex-direction: column; gap: 1rem; border-radius: 24px; text-align: center; }
   }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo">Watt<span class="bot">Bot</span> <span class="bolt">&#9889;</span></div>
-  <div class="tagline">Smart IoT Energy Monitor</div>
-</div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">Watt<span>Bot</span> ⚡</div>
+    <div class="tagline">Next-Gen Energy Intelligence</div>
+  </div>
 
 )rawliteral";
 
   // Live readings
   html += "<div class='grid'>";
-  html += "<div class='card'><div class='val'>" + String(voltage,1)     + "</div><div class='unit'>V</div><div class='lbl'>Voltage</div></div>";
-  html += "<div class='card'><div class='val'>" + String(current,2)     + "</div><div class='unit'>A</div><div class='lbl'>Current</div></div>";
-  html += "<div class='card'><div class='val'>" + String(power,1)       + "</div><div class='unit'>W</div><div class='lbl'>Power</div></div>";
-  html += "<div class='card'><div class='val'>" + String(energy,3)      + "</div><div class='unit'>kWh</div><div class='lbl'>Energy</div></div>";
-  html += "<div class='card'><div class='val'>" + String(frequency,1)   + "</div><div class='unit'>Hz</div><div class='lbl'>Frequency</div></div>";
-  html += "<div class='card'><div class='val'>" + String(powerFactor,2) + "</div><div class='unit'>PF</div><div class='lbl'>Power Factor</div></div>";
+  html += "<div class='card metric-card metric-v'><div class='metric-icon'>⚡</div><div class='metric-val'>" + String(voltage,1)     + "<span>V</span></div><div class='metric-lbl'>Voltage</div></div>";
+  html += "<div class='card metric-card metric-a'><div class='metric-icon'>🌊</div><div class='metric-val'>" + String(current,2)     + "<span>A</span></div><div class='metric-lbl'>Current</div></div>";
+  html += "<div class='card metric-card metric-w'><div class='metric-icon'>🔥</div><div class='metric-val'>" + String(power,1)       + "<span>W</span></div><div class='metric-lbl'>Power</div></div>";
+  html += "<div class='card metric-card metric-k'><div class='metric-icon'>📈</div><div class='metric-val'>" + String(energy,3)      + "<span>kWh</span></div><div class='metric-lbl'>Energy</div></div>";
+  html += "<div class='card metric-card'><div class='metric-icon'>〰️</div><div class='metric-val'>" + String(frequency,1)   + "<span>Hz</span></div><div class='metric-lbl'>Frequency</div></div>";
+  html += "<div class='card metric-card'><div class='metric-icon'>📐</div><div class='metric-val'>" + String(powerFactor,2) + "</div><div class='metric-lbl'>Power Factor</div></div>";
   html += "</div>";
 
+  html += "<div class='section-grid'>";
+  
   // Bill estimates
-  html += "<div class='section'><h2>Bill Estimate (Rs." + String(ratePerUnit,1) + "/kWh)</h2>";
-  html += "<div class='bill-grid'>";
-  html += "<div class='bill-item'><div class='bval'>Rs." + String(calcBill(power,1),2)   + "</div><div class='blbl'>1 Hour</div></div>";
-  html += "<div class='bill-item'><div class='bval'>Rs." + String(calcBill(power,24),2)  + "</div><div class='blbl'>1 Day</div></div>";
-  html += "<div class='bill-item'><div class='bval'>Rs." + String(calcBill(power,168),2) + "</div><div class='blbl'>7 Days</div></div>";
-  html += "<div class='bill-item'><div class='bval'>Rs." + String(calcBill(power,720),2) + "</div><div class='blbl'>30 Days</div></div>";
+  html += "<div class='section'><div class='section-title'>Bill Estimate (Rs." + String(ratePerUnit,1) + "/kWh)</div>";
+  html += "<div class='data-grid'>";
+  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,1),2)   + "</div><div class='data-lbl'>1 Hour</div></div>";
+  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,24),2)  + "</div><div class='data-lbl'>1 Day</div></div>";
+  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,168),2) + "</div><div class='data-lbl'>7 Days</div></div>";
+  html += "<div class='data-item bill-item'><div class='data-val'>Rs." + String(calcBill(power,720),2) + "</div><div class='data-lbl'>30 Days</div></div>";
   html += "</div>";
   html += R"rawliteral(
   <div class="rate-form">
     <input type="number" id="rI" placeholder="New rate (Rs/kWh)" step="0.1" min="0.1" max="50" inputmode="decimal">
-    <button onclick="var r=document.getElementById('rI').value;if(r>0&&r<=50)window.location.href='/setrate?rate='+r;else alert('Enter 0.1-50');">Set Rate</button>
+    <button onclick="var r=document.getElementById('rI').value;if(r>0&&r<=50)window.location.href='/setrate?rate='+r;else alert('Enter a valid rate between 0.1 and 50');">Update</button>
   </div>
   </div>)rawliteral";
 
   // Appliance Running Time
-  html += "<div class='section'><h2>Appliance Running Time</h2>";
+  html += "<div class='section'><div class='section-title'>Appliance Tracking</div>";
   if (applianceOn) {
-    html += "<div class='appliance-status appliance-on'><div class='status-dot dot-on'></div>Appliance is ON — Currently Running</div>";
+    html += "<div class='status-badge status-on'><div class='pulse-dot'></div>Active — Currently Running</div>";
   } else {
-    html += "<div class='appliance-status appliance-off'><div class='status-dot dot-off'></div>Appliance is OFF</div>";
+    html += "<div class='status-badge status-off'><div class='pulse-dot'></div>Standby — Powered Off</div>";
   }
-  html += "<div class='run-grid'>";
-  html += "<div class='run-item'><div class='rval'>" + formatRunTime(runTimePerHour)         + "</div><div class='rlbl'>Per Hour</div></div>";
-  html += "<div class='run-item'><div class='rval'>" + String(runTimePerDay, 1) + " hrs"     + "</div><div class='rlbl'>Per Day</div></div>";
-  html += "<div class='run-item'><div class='rval'>" + String(runTimePerWeek, 1) + " hrs"    + "</div><div class='rlbl'>Per Week</div></div>";
-  html += "<div class='run-item'><div class='rval'>" + String(runTimePerMonth, 1) + " hrs"   + "</div><div class='rlbl'>Per Month</div></div>";
+  html += "<div class='data-grid' style='margin-bottom: 1rem;'>";
+  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + formatRunTime(runTimePerHour)         + "</div><div class='data-lbl'>Per Hour</div></div>";
+  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + String(runTimePerDay, 1) + "h"     + "</div><div class='data-lbl'>Per Day</div></div>";
+  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + String(runTimePerWeek, 1) + "h"    + "</div><div class='data-lbl'>Per Week</div></div>";
+  html += "<div class='data-item'><div class='data-val' style='color:#fb923c;'>" + String(runTimePerMonth, 1) + "h"   + "</div><div class='data-lbl'>Per Month</div></div>";
   html += "</div>";
-  html += "<div style='color:#64748b;font-size:0.82rem;margin-top:8px;'>Total session ON time: <b style='color:#fb923c'>" + formatRunTime(runTimeTotalSec) + "</b> &nbsp;|&nbsp; Threshold: >" + String(APPLIANCE_ON_THRESHOLD,0) + "W</div>";
+  html += "<div style='color:var(--text-muted);font-size:0.85rem;text-align:center;'>Total session ON time: <span style='color:#fb923c;font-weight:700;'>" + formatRunTime(runTimeTotalSec) + "</span> | Threshold: >" + String(APPLIANCE_ON_THRESHOLD,0) + "W</div>";
   html += "</div>";
 
   // AI Prediction
-  html += "<div class='section'><h2>AI Prediction (XGBoost + LightGBM)</h2>";
+  html += "<div class='section' style='grid-column: 1 / -1;'><div class='section-title ai-title'>AI Forecaster (XGBoost + LightGBM)</div>";
   if (predictionReady) {
-    html += "<div class='bill-grid'>";
-    html += "<div class='ai-card'><div class='aval'>" + String(predictedPower,1)  + " W</div><div class='albl'>Predicted Power</div></div>";
-    html += "<div class='ai-card'><div class='aval'>Rs." + String(predictedBill1h,2) + "</div><div class='albl'>Predicted/Hour</div></div>";
-    html += "<div class='ai-card'><div class='aval'>Rs." + String(predictedBill1d,2) + "</div><div class='albl'>Predicted/Day</div></div>";
-    html += "<div class='ai-card'><div class='aval'>" + String(predictedKwh1d,3)  + " kWh</div><div class='albl'>Predicted kWh/Day</div></div>";
+    html += "<div class='data-grid' style='grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem;'>";
+    html += "<div class='data-item ai-item'><div class='data-val'>" + String(predictedPower,1)  + " W</div><div class='data-lbl'>Predicted Power</div></div>";
+    html += "<div class='data-item ai-item'><div class='data-val'>Rs." + String(predictedBill1h,2) + "</div><div class='data-lbl'>Predicted / Hour</div></div>";
+    html += "<div class='data-item ai-item'><div class='data-val'>Rs." + String(predictedBill1d,2) + "</div><div class='data-lbl'>Predicted / Day</div></div>";
+    html += "<div class='data-item ai-item'><div class='data-val'>" + String(predictedKwh1d,3)  + " kWh</div><div class='data-lbl'>Predicted kWh / Day</div></div>";
     html += "</div>";
-    html += "<div style='color:#7dd3fc;font-size:1rem;font-weight:700;margin:16px 0 8px;'>AI Predicted Running Time</div>";
-    html += "<div class='ai-run-grid'>";
-    html += "<div class='ai-run-item'><div class='arval'>" + String(predictedRunHour*60,0)  + " min</div><div class='arlbl'>Per Hour</div></div>";
-    html += "<div class='ai-run-item'><div class='arval'>" + String(predictedRunDay,1)      + " hrs</div><div class='arlbl'>Per Day</div></div>";
-    html += "<div class='ai-run-item'><div class='arval'>" + String(predictedRunWeek,1)     + " hrs</div><div class='arlbl'>Per Week</div></div>";
-    html += "<div class='ai-run-item'><div class='arval'>" + String(predictedRunMonth,1)    + " hrs</div><div class='arlbl'>Per Month</div></div>";
+    
+    html += "<div class='data-lbl' style='margin-bottom: 1rem; color:var(--accent-2);'>AI Predicted Running Time</div>";
+    html += "<div class='data-grid' style='grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));'>";
+    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunHour*60,0)  + "m</div><div class='data-lbl'>Per Hour</div></div>";
+    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunDay,1)      + "h</div><div class='data-lbl'>Per Day</div></div>";
+    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunWeek,1)     + "h</div><div class='data-lbl'>Per Week</div></div>";
+    html += "<div class='data-item'><div class='data-val' style='color:#a78bfa;'>" + String(predictedRunMonth,1)    + "h</div><div class='data-lbl'>Per Month</div></div>";
     html += "</div>";
-    html += "<div class='status' style='color:#94a3b8;margin-top:12px;'>Last updated: " + predictionTime + "</div>";
+    html += "<div style='color:var(--text-muted);font-size:0.85rem;text-align:right;margin-top:1rem;'>Last updated: " + predictionTime + "</div>";
   } else {
-    html += "<div style='color:#94a3b8;text-align:center;padding:16px;'>Waiting for predictions...<br><small style='color:#64748b;margin-top:8px;display:block;'>Run predict_server.py on your PC</small></div>";
+    html += "<div style='padding: 3rem; text-align: center; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);'>";
+    html += "<div class='pulse-dot' style='background: var(--accent-2); box-shadow: 0 0 15px var(--accent-2); margin: 0 auto 1rem;'></div>";
+    html += "<div style='font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.5rem;'>Awaiting Intelligence</div>";
+    html += "<div style='color: var(--text-muted); font-size: 0.9rem;'>Start predict_server.py on the master node</div>";
+    html += "</div>";
   }
   html += "</div>";
+  
+  html += "</div>"; // End section-grid
 
-  html += "<div class='status'>Sensor: <span class='" + String(sensorOk ? "badge-ok" : "badge-err") + "'>" + String(sensorOk ? "OK" : "ERROR") + "</span>";
-  html += " &nbsp;|&nbsp; WiFi: <span class='badge-ok'>" + WiFi.localIP().toString() + "</span>";
-  html += " &nbsp;|&nbsp; Auto-refresh: 5s</div>";
+  html += "<div class='footer-status'>";
+  html += "<div class='status-item'>Sensor: <span class='" + String(sensorOk ? "status-ok" : "status-err") + "'>" + String(sensorOk ? "ONLINE" : "OFFLINE") + "</span></div>";
+  html += "<div class='status-item'>Network: <span class='status-ip'>" + WiFi.localIP().toString() + "</span></div>";
+  html += "<div class='status-item'>Sync: <span style='color:var(--text-main);'>5s Interval</span></div>";
+  html += "</div>";
 
-  html += "<div class='footer'>Powered by <b>WattBot</b> &nbsp;&#9889;&nbsp; IoT Energy Intelligence</div>";
+  html += "<div style='text-align:center; margin-top: 2rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; letter-spacing: 1px;'>";
+  html += "Powered by <span style='color: var(--accent-1); font-weight: 700;'>WattBot</span> ⚡ Intelligent Energy";
+  html += "</div>";
+
+  html += "</div>"; // End container
   html += "</body></html>";
   return html;
 }
