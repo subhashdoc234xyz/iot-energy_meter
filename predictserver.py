@@ -258,24 +258,32 @@ def predict_next_hour():
             'predicted_power_w':   0,
             'predicted_bill_1h':   0,
             'predicted_bill_1d':   0,
+            'predicted_kwh_1h':    0,
             'predicted_kwh_1d':    0,
+            'predicted_kwh_7d':    0,
+            'predicted_kwh_30d':   0,
             'predicted_run_hour':  0,
             'predicted_run_day':   0,
             'predicted_run_week':  0,
             'predicted_run_month': 0,
         }), 200
 
-    power_w, run_min = result
-    bill_1h, kwh_1h  = calculate_bill(power_w, 1)
-    bill_1d, kwh_1d  = calculate_bill(power_w, 24)
-    runtime          = run_time_breakdown(run_min)
+    power_w, run_min  = result
+    bill_1h, kwh_1h   = calculate_bill(power_w, 1)
+    bill_1d, kwh_1d   = calculate_bill(power_w, 24)
+    bill_7d, kwh_7d   = calculate_bill(power_w, 168)
+    bill_30d, kwh_30d = calculate_bill(power_w, 720)
+    runtime           = run_time_breakdown(run_min)
 
     return jsonify({
         # ── FLAT keys — read directly by ESP32 fetchPrediction() ──
         'predicted_power_w':   round(power_w, 2),
         'predicted_bill_1h':   bill_1h,
         'predicted_bill_1d':   bill_1d,
+        'predicted_kwh_1h':    kwh_1h,
         'predicted_kwh_1d':    kwh_1d,
+        'predicted_kwh_7d':    kwh_7d,
+        'predicted_kwh_30d':   kwh_30d,
         'predicted_run_hour':  runtime['per_hour_hr'],
         'predicted_run_day':   runtime['per_day_hr'],
         'predicted_run_week':  runtime['per_week_hr'],
