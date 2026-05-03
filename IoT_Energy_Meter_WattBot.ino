@@ -72,6 +72,9 @@ float predictedPower  = 0.0;
 float predictedBill1h = 0.0;
 float predictedBill1d = 0.0;
 float predictedKwh1d  = 0.0;
+float predictedKwh1h  = 0.0;
+float predictedKwh7d  = 0.0;
+float predictedKwh30d = 0.0;
 bool  predictionReady = false;
 String predictionTime = "--:--";
 
@@ -124,10 +127,14 @@ float loadRate() {
 }
 
 // ════════════════════════════════════════════════════════════
-//   BILL CALCULATION
+//   BILL & KWH CALCULATION
 // ════════════════════════════════════════════════════════════
 float calcBill(float watts, float hours) {
   return ((watts * hours) / 1000.0) * ratePerUnit;
+}
+
+float calcKwh(float watts, float hours) {
+  return (watts * hours) / 1000.0;
 }
 
 // ════════════════════════════════════════════════════════════
@@ -369,6 +376,9 @@ void fetchPrediction() {
       predictedBill1h     = doc["predicted_bill_1h"]     | 0.0f;
       predictedBill1d     = doc["predicted_bill_1d"]     | 0.0f;
       predictedKwh1d      = doc["predicted_kwh_1d"]      | 0.0f;
+      predictedKwh1h      = doc["predicted_kwh_1h"]      | 0.0f;
+      predictedKwh7d      = doc["predicted_kwh_7d"]      | 0.0f;
+      predictedKwh30d     = doc["predicted_kwh_30d"]     | 0.0f;
       predictedRunHour    = doc["predicted_run_hour"]    | 0.0f;
       predictedRunDay     = doc["predicted_run_day"]     | 0.0f;
       predictedRunWeek    = doc["predicted_run_week"]    | 0.0f;
@@ -493,12 +503,16 @@ String buildDashboardHTML() {
 
   <div class="section-grid">
     <div class="section">
-      <div class="section-title">Bill Estimate <span id="val-rate-title" style="font-size: 0.9rem; color: var(--text-muted); margin-left: 10px;"></span></div>
+      <div class="section-title">Bill &amp; kWh Estimate <span id="val-rate-title" style="font-size: 0.9rem; color: var(--text-muted); margin-left: 10px;"></span></div>
       <div class="data-grid">
-        <div class="data-item bill-item"><div class="data-val" id="bill-1h">--</div><div class="data-lbl">1 Hour</div></div>
-        <div class="data-item bill-item"><div class="data-val" id="bill-1d">--</div><div class="data-lbl">1 Day</div></div>
-        <div class="data-item bill-item"><div class="data-val" id="bill-7d">--</div><div class="data-lbl">7 Days</div></div>
-        <div class="data-item bill-item"><div class="data-val" id="bill-30d">--</div><div class="data-lbl">30 Days</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-1h">--</div><div class="data-lbl">Bill / 1 Hour</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-1d">--</div><div class="data-lbl">Bill / 1 Day</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-7d">--</div><div class="data-lbl">Bill / 7 Days</div></div>
+        <div class="data-item bill-item"><div class="data-val" id="bill-30d">--</div><div class="data-lbl">Bill / 30 Days</div></div>
+        <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" id="kwh-1h" style="color:#00f0ff;">--</div><div class="data-lbl">kWh / 1 Hour</div></div>
+        <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" id="kwh-1d" style="color:#00f0ff;">--</div><div class="data-lbl">kWh / 1 Day</div></div>
+        <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" id="kwh-7d" style="color:#00f0ff;">--</div><div class="data-lbl">kWh / 7 Days</div></div>
+        <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" id="kwh-30d" style="color:#00f0ff;">--</div><div class="data-lbl">kWh / 30 Days</div></div>
       </div>
       <div class="rate-form">
         <input type="number" id="rI" placeholder="New rate (Rs/kWh)" step="0.1" min="0.1" max="50" inputmode="decimal">
@@ -570,6 +584,10 @@ function updateData() {
     updateText('bill-1d', "Rs." + d.bill_1d.toFixed(2));
     updateText('bill-7d', "Rs." + (d.bill_1d * 7).toFixed(2));
     updateText('bill-30d', "Rs." + (d.bill_1d * 30).toFixed(2));
+    updateText('kwh-1h',  d.kwh_1h.toFixed(4) + " kWh");
+    updateText('kwh-1d',  d.kwh_1d.toFixed(3) + " kWh");
+    updateText('kwh-7d',  d.kwh_7d.toFixed(2) + " kWh");
+    updateText('kwh-30d', d.kwh_30d.toFixed(2) + " kWh");
 
     const appStatus = document.getElementById('app-status');
     const appTxt = document.getElementById('app-status-txt');
@@ -599,6 +617,9 @@ function updateData() {
           <div class="data-item ai-item"><div class="data-val">Rs.${ai.bill_1h.toFixed(2)}</div><div class="data-lbl">Predicted / Hour</div></div>
           <div class="data-item ai-item"><div class="data-val">Rs.${ai.bill_1d.toFixed(2)}</div><div class="data-lbl">Predicted / Day</div></div>
           <div class="data-item ai-item"><div class="data-val">${ai.kwh_1d.toFixed(3)} kWh</div><div class="data-lbl">Predicted kWh / Day</div></div>
+          <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" style="color:#00f0ff;">${ai.kwh_1h.toFixed(4)} kWh</div><div class="data-lbl">Predicted kWh / Hour</div></div>
+          <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" style="color:#00f0ff;">${ai.kwh_7d.toFixed(2)} kWh</div><div class="data-lbl">Predicted kWh / 7 Days</div></div>
+          <div class="data-item" style="border:1px solid rgba(0,240,255,0.15);"><div class="data-val" style="color:#00f0ff;">${ai.kwh_30d.toFixed(2)} kWh</div><div class="data-lbl">Predicted kWh / 30 Days</div></div>
         </div>
         <div class="data-lbl" style="margin-bottom: 1rem; color:var(--accent-2);">AI Predicted Running Time</div>
         <div class="data-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
@@ -652,6 +673,10 @@ String buildDataJSON() {
   doc["rate"]          = ratePerUnit;
   doc["bill_1h"]       = round(calcBill(power,1) * 100) / 100.0;
   doc["bill_1d"]       = round(calcBill(power,24) * 100) / 100.0;
+  doc["kwh_1h"]        = round(calcKwh(power,1) * 10000) / 10000.0;
+  doc["kwh_1d"]        = round(calcKwh(power,24) * 1000) / 1000.0;
+  doc["kwh_7d"]        = round(calcKwh(power,168) * 100) / 100.0;
+  doc["kwh_30d"]       = round(calcKwh(power,720) * 100) / 100.0;
   doc["sensor_ok"]     = sensorOk;
   doc["appliance_on"]  = applianceOn;
   doc["run_total_sec"] = runTimeTotalSec;
@@ -664,6 +689,9 @@ String buildDataJSON() {
   ai["bill_1h"]        = predictedBill1h;
   ai["bill_1d"]        = predictedBill1d;
   ai["kwh_1d"]         = predictedKwh1d;
+  ai["kwh_1h"]         = predictedKwh1h;
+  ai["kwh_7d"]         = predictedKwh7d;
+  ai["kwh_30d"]        = predictedKwh30d;
   ai["run_hour"]       = predictedRunHour;
   ai["run_day"]        = predictedRunDay;
   ai["run_week"]       = predictedRunWeek;
