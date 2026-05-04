@@ -191,12 +191,12 @@ void readSensor() {
   float e  = pzem.energy();
   float f  = pzem.frequency();
   float pf = pzem.pf();
-
+// caliberation
   if (!isnan(v) && !isnan(c) && !isnan(p)) {
-    voltage     = v  * 1.03607;
+    voltage     = v  * 0.9851;
     current     = c;
-    power       = p  * 1.03607;
-    energy      = e  * 1.03607;
+    power       = p  * 0.9851;
+    energy      = e  * 0.9851;
     frequency   = f;
     powerFactor = pf;
     sensorOk    = true;
