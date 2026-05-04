@@ -210,7 +210,7 @@ void readSensor() {
 //   OLED PAGES
 // ════════════════════════════════════════════════════════════
 void oledPage0_LiveReadings() {
-  display.setRotation(2);
+  display.setRotation(0);
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
@@ -225,7 +225,7 @@ void oledPage0_LiveReadings() {
 }
 
 void oledPage1_FreqPF() {
-  display.setRotation(2);
+  display.setRotation(0);
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
@@ -238,7 +238,7 @@ void oledPage1_FreqPF() {
 }
 
 void oledPage2_Bills() {
-  display.setRotation(2);
+  display.setRotation(0);
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
@@ -252,7 +252,7 @@ void oledPage2_Bills() {
 }
 
 void oledPage3_RunTime() {
-  display.setRotation(2);
+  display.setRotation(0);
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
@@ -272,7 +272,7 @@ void oledPage3_RunTime() {
 }
 
 void oledPage4_AIPrediction() {
-  display.setRotation(2);
+  display.setRotation(0);
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
@@ -293,7 +293,7 @@ void oledPage4_AIPrediction() {
 }
 
 void oledPage5_WiFiStatus() {
-  display.setRotation(2);
+  display.setRotation(0);
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
@@ -869,7 +869,7 @@ void setup() {
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("[OLED] Init failed!"));
   } else {
-    display.setRotation(2);             // Kept your original rotation config
+    display.setRotation(0);             // Kept your original rotation config
     display.setTextColor(SSD1306_WHITE); // ← FIX: required before any print
     display.setTextSize(1);
 
